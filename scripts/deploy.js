@@ -2,7 +2,7 @@ const hre = require("hardhat");
 
 async function main() {
   const [owner] = await hre.ethers.getSigners();
-  const Message = await hre.ethers.getContractFactory("Message");
+  const Message = await hre.ethers.getContractFactory("Anon");
   const contract = await Message.deploy();
   await contract.deployed();
   console.log(
