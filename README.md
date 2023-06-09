@@ -41,6 +41,9 @@ The contract provides the following **functions**:
 
 **downVote(uint256 _id)**: Downvote a post specified by its ID.
 
+**removePost()**: Removes a post if it has received more downvotes than upvotes within 24 hours. The removal is based on the voting results and is performed automatically.
+
+
 The posts are automatically deleted after 24 hours based on the voting results. If a post receives a higher number of downvotes than upvotes within this timeframe, it will be removed from the contract.
 
 ### Contributing
