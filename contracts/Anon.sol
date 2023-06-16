@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.19;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
  * @title ANON
  * @dev A contract for posting and voting on content.
  */
-contract ANON {
+contract Anon is ERC20 {
     address private owner;
     uint256 public postID;
 
@@ -28,8 +29,9 @@ contract ANON {
     /**
      * @dev Initializes the contract and sets the contract deployer as the owner.
      */
-    constructor() {
+    constructor() ERC20("CSE-Token", "CSE") {
         owner = msg.sender;
+        _mint(owner, 1000 * 10**decimals());
     }
 
     /**
@@ -121,15 +123,9 @@ contract ANON {
                 postedInfo[i].downVoted = true;
                 allPost[i].downVoted = true;
                 blacklistedAddress[resInfo[i]] = block.timestamp;
+            } else if (postedInfo[i].time + 86520 >= currentTime) {
+                //mint CSE token to the poster
             }
         }
-    }
-
-    /**
-     * @dev Destroys the contract and transfers the remaining balance to the contract owner.
-     */
-    function destroyContract() external {
-        require(owner == msg.sender, "Only Owner can destroy it.");
-        selfdestruct(payable(owner));
     }
 }
