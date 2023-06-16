@@ -7,6 +7,9 @@ ANON is a Solidity contract that enables anonymous posting and voting on content
 - Create posts anonymously with content and timestamp
 - Upvote and downvote posts
 - Automatic deletion of posts after 24 hours based on voting results
+- Automatic post removal based on downvotes.
+- Minting of CSE tokens for posts with a certain threshold of upvotes.
+- Blacklisting and whitelisting of addresses.
 
 ## Getting Started
 
