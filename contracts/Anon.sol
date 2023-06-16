@@ -25,6 +25,7 @@ contract Anon is ERC20 {
 
     postInfo[] internal allPost;
     mapping(address => uint256) internal blacklistedAddress;
+    mapping(uint256 => mapping(address => bool)) internal isCoinMinted;
 
     /**
      * @dev Initializes the contract and sets the contract deployer as the owner.
@@ -67,6 +68,7 @@ contract Anon is ERC20 {
         resInfo[postID] = msg.sender;
         postedInfo[postID] = tempPost;
         allPost.push(tempPost);
+        isCoinMinted[postID][resInfo[postID]] == false;
         postID++;
     }
 
@@ -114,18 +116,49 @@ contract Anon is ERC20 {
     }
 
     /**
+     * @dev Checks if the upvotes are 50% greater than the downvotes.
+     * @param _id The ID of the post.
+     * @return A boolean indicating whether the upvotes are 50% greater than the downvotes.
+     */
+    function isUPFifty(uint256 _id) internal view returns (bool) {
+        uint256 fiftyPercentOfDownvotes = (postDown[_id] * 3) / 2;
+        if (postUP[_id] >= fiftyPercentOfDownvotes) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @dev Removes a post if it has more downvotes than upvotes in 24 hours.
      */
     function removePost() public {
         uint256 currentTime = block.timestamp;
         for (uint256 i = 0; i < allPost.length; i++) {
-            if (postedInfo[i].time + 86400 <= currentTime && shouldDelete(i)) {
-                postedInfo[i].downVoted = true;
-                allPost[i].downVoted = true;
-                blacklistedAddress[resInfo[i]] = block.timestamp;
-            } else if (postedInfo[i].time + 86520 >= currentTime) {
-                //mint CSE token to the poster
+            if (postedInfo[i].time + 86400 <= currentTime) {
+                if (shouldDelete(i)) {
+                    postedInfo[i].downVoted = true;
+                    allPost[i].downVoted = true;
+                    blacklistedAddress[resInfo[i]] = block.timestamp;
+                } else if (isUPFifty(i)) {
+                    require(
+                        isCoinMinted[i][resInfo[i]] == false,
+                        "Already minted once!"
+                    );
+                    // Mint CSE token to the poster
+                    isCoinMinted[i][resInfo[i]] = true;
+                    mintCoin(resInfo[i], 1 * 10**(decimals() - 2));
+                }
             }
         }
+    }
+
+    /**
+     * @dev Mints CSE tokens to a specified address.
+     * @param acc The address to which the tokens will be minted.
+     * @param amount The amount of tokens to mint.
+     */
+    function mintCoin(address acc, uint256 amount) internal {
+        _mint(acc, amount);
     }
 }
