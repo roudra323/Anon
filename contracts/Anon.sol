@@ -15,6 +15,7 @@ contract Anon is ERC20, Pausable, Ownable {
         string post;
         uint256 time;
         bool downVoted;
+        string[] comments;
     }
 
     uint256 public postID;
@@ -44,7 +45,8 @@ contract Anon is ERC20, Pausable, Ownable {
             postID,
             _post,
             block.timestamp,
-            false
+            false,
+            new string[](0)
         );
         resInfo[postID] = msg.sender;
         postedInfo[postID] = tempPost;
@@ -103,6 +105,37 @@ contract Anon is ERC20, Pausable, Ownable {
                 }
             }
         }
+    }
+
+    /**
+     * @dev Allows users to edit their own posts.
+     * @param _id The ID of the post to be edited.
+     * @param _newPost The updated content of the post.
+     */
+    function editPost(uint256 _id, string calldata _newPost) external {
+        require(resInfo[_id] == msg.sender, "Cannot edit other user's post");
+        require(postedInfo[_id].downVoted == false, "Post already removed");
+        postedInfo[_id].post = _newPost;
+        allPost[_id].post = _newPost;
+    }
+
+    /**
+     * @dev Adds a comment to a post.
+     * @param _id The ID of the post to comment on.
+     * @param _comment The comment to be added.
+     */
+    function addComment(uint256 _id, string calldata _comment) external {
+        require(postedInfo[_id].downVoted == false, "Post already removed");
+        postedInfo[_id].comments.push(_comment);
+    }
+
+    /**
+     * @dev Retrieves all comments for a post.
+     * @param _id The ID of the post.
+     * @return An array of comments for the specified post.
+     */
+    function viewComments(uint256 _id) external view returns (string[] memory) {
+        return postedInfo[_id].comments;
     }
 
     /**
