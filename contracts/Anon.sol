@@ -4,12 +4,14 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * @title ANON
  * @dev A contract for posting and voting on content.
  */
-contract Anon is ERC20, Pausable, Ownable {
+contract Anon is ERC20, Pausable, Ownable, SafeMath {
+    using SafeMath for uint256;
     struct PostInfo {
         uint256 id;
         string post;
@@ -52,7 +54,8 @@ contract Anon is ERC20, Pausable, Ownable {
         postedInfo[postID] = tempPost;
         allPost.push(tempPost);
         isCoinMinted[postID][resInfo[postID]] = false;
-        postID++;
+        // postID++;
+        postID = postID.add(1);
     }
 
     /**
@@ -71,7 +74,8 @@ contract Anon is ERC20, Pausable, Ownable {
         require(allPost.length != 0, "No post found containing this id");
         require(resInfo[_id] != msg.sender, "Cannot upvote your own post");
         voters[_id].push(msg.sender);
-        postUP[_id]++;
+        // postUP[_id]++;
+        postUP[_id] = postUP[_id].add(1);
     }
 
     /**
@@ -82,7 +86,8 @@ contract Anon is ERC20, Pausable, Ownable {
         require(allPost.length != 0, "No post found containing this id");
         require(resInfo[_id] != msg.sender, "Cannot downvote your own post");
         voters[_id].push(msg.sender);
-        postDown[_id]++;
+        // postDown[_id]++;
+        postDown[_id] = postDown[_id].add(1);
     }
 
     /**
